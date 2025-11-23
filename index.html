@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在安卓手机上配置Kali Linux与Metasploit完整指南</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #7b1fa2;
+            --accent-color: #e91e63;
+            --light-color: #f5f5f5;
+            --dark-color: #333;
+            --code-bg: #2d2d2d;
+            --code-color: #f8f8f2;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f9f9f9;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background-color: var(--accent-color);
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: var(--dark-color);
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .note {
+            background-color: #e3f2fd;
+            border-left: 4px solid var(--info-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning {
+            background-color: #fff8e1;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .method {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+        
+        .method-title {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .method-title::before {
+            content: "▶";
+            margin-right: 8px;
+            color: var(--accent-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .toc {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            columns: 2;
+            list-style-type: none;
+        }
+        
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: var(--secondary-color);
+            transition: color 0.3s;
+        }
+        
+        .toc a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .toc ul {
+                columns: 1;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>📱 在安卓手机上配置Kali Linux与Metasploit完整指南</h1>
+            <p class="subtitle">通过Termux在安卓设备上安装Kali Linux和Metasploit框架，打造移动安全测试环境</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="toc">
+            <h2>目录</h2>
+            <ul>
+                <li><a href="#preparation">准备工作</a></li>
+                <li><a href="#termux">安装与配置Termux</a></li>
+                <li><a href="#kali">安装Kali Linux</a></li>
+                <li><a href="#gui">安装图形化界面（可选）</a></li>
+                <li><a href="#metasploit">安装Metasploit框架</a></li>
+                <li><a href="#troubleshooting">解决常见问题</a></li>
+                <li><a href="#verification">最终验证</a></li>
+                <li><a href="#tips">使用建议与注意事项</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="preparation">
+            <h2>✨ 准备工作</h2>
+            <p>在开始安装之前，你需要准备：</p>
+            <ul>
+                <li>一部<strong>安卓手机</strong>（建议Android 7.0或更高版本）</li>
+                <li>至少<strong>5GB的可用存储空间</strong></li>
+                <li><strong>稳定的网络连接</strong></li>
+            </ul>
+            <div class="note">
+                <p><strong>提示：</strong> 建议使用性能较好的设备，因为运行Kali Linux和Metasploit需要一定的系统资源。</p>
+            </div>
+        </div>
+
+        <div class="section" id="termux">
+            <h2>📲 第一步：安装与配置Termux</h2>
+            
+            <h3>1.1 下载Termux</h3>
+            <p>Termux可以通过多个渠道安装：</p>
+            <ul>
+                <li><strong>F-Droid（推荐）：</strong> 访问<a href="https://f-droid.org/" target="_blank">F-Droid官网</a>下载</li>
+                <li><strong>GitHub：</strong> 从<a href="https://github.com/termux/termux-app" target="_blank">Termux官方GitHub仓库</a>下载</li>
+                <li><strong>Google Play Store：</strong> 搜索"Termux"并安装</li>
+            </ul>
+            
+            <div class="warning">
+                <p><strong>注意：</strong> 避免从非官方来源下载Mod APK版本，因为它们可能包含恶意软件或导致设备不稳定。</p>
+            </div>
+            
+            <h3>1.2 基础配置</h3>
+            <p>安装完成后，打开Termux并进行以下基础配置：</p>
+            
+            <div class="method">
+                <div class="method-title">更新软件包列表和升级软件包</div>
+                <pre><code>pkg update && pkg upgrade</code></pre>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">获取存储权限</div>
+                <pre><code>termux-setup-storage</code></pre>
+                <p>在弹出的权限请求中点击"允许"，这样Termux就能访问手机的存储空间。</p>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">安装必要工具</div>
+                <pre><code>pkg install wget openssl-tool proot tar git -y</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="kali">
+            <h2>🔐 第二步：安装Kali Linux</h2>
+            <p>有以下几种方法可以在Termux中安装Kali Linux，你可以根据需求选择其一。</p>
+            
+            <div class="method">
+                <div class="method-title">方法一：使用AndronixOrigin脚本（推荐新手）</div>
+                <p>这种方法简单直接，适合初次尝试的用户。</p>
+                <pre><code># 下载Kali Linux安装脚本
+wget https://raw.githubusercontent.com/Techriz/AndronixOrigin/master/Installer/Kali/kali.sh
+
+# 运行安装脚本
+bash kali.sh</code></pre>
+                <p>安装完成后，你会看到一个提示，告诉你如何启动Kali Linux环境。通常启动命令是<code>./start-kali.sh</code>。</p>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">方法二：使用atilo脚本</div>
+                <p>atilo是一个专门为Termux设计的Linux发行版安装脚本，支持多种Linux发行版。</p>
+                <pre><code># 安装atilo
+pkg install wget
+wget https://raw.githubusercontent.com/neobash/atilo/master/atilo
+chmod +x atilo
+./atilo</code></pre>
+                <p>运行atilo后，会出现一个菜单供你选择要安装的Linux发行版，选择Kali Linux即可。</p>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">方法三：手动安装Kali文件系统</div>
+                <p>这种方法让你对整个安装过程有更全面的控制。</p>
+                <pre><code># 下载Kali Linux文件系统（根据你的设备架构选择）
+# 对于64位设备（现代手机通常都是）：
+wget https://build.nethunter.com/kalifs/kalifs-arm64-full.tar.xz
+
+# 创建解压目录
+mkdir kalifs && cd kalifs
+
+# 解压文件系统
+proot --link2symlink tar -xf ../kalifs-arm64-full.tar.xz -C .
+
+# 启动Kali环境
+proot -w / -b /dev -b /sys -b /proc -b /sdcard -b /storage --link2symlink /bin/bash</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="gui">
+            <h2>🖥️ 第三步：安装图形化界面（可选）</h2>
+            <p>如果你希望在Kali Linux中使用图形界面，可以安装XFCE4桌面环境：</p>
+            
+            <div class="method">
+                <div class="method-title">安装XFCE4桌面环境</div>
+                <pre><code># 在Kali Linux环境中执行
+apt install wget
+wget https://raw.githubusercontent.com/Techriz/AndronixOrigin/master/APT/XFCE4/xfce4_de.sh
+bash xfce4_de.sh</code></pre>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">安装和配置VNC服务器</div>
+                <pre><code># 安装VNC服务器
+apt install tigervnc-standalone-server -y
+
+# 配置VNC
+vncserver
+vncserver -kill :1</code></pre>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">创建VNC启动脚本</div>
+                <p>创建文件<code>~/.vnc/xstartup</code>并添加以下内容：</p>
+                <pre><code>#!/bin/bash
+export XKL_XMODMAP_DISABLE=1
+export XDG_CURRENT_DESKTOP="XFCE"
+export XDG_MENU_PREFIX="xfce-"
+exec dbus-launch --exit-with-session startxfce4</code></pre>
+                <p>然后给脚本添加执行权限：<code>chmod +x ~/.vnc/xstartup</code></p>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">启动VNC服务器</div>
+                <pre><code>vncserver -geometry 1024x768 -localhost no</code></pre>
+                <p>在安卓设备上安装VNC Viewer应用，连接到<code>localhost:5901</code>，使用之前设置的密码即可看到Kali Linux的图形界面。</p>
+            </div>
+        </div>
+
+        <div class="section" id="metasploit">
+            <h2>💣 第四步：安装Metasploit框架</h2>
+            
+            <div class="method">
+                <div class="method-title">方法一：通过Termux官方仓库安装（最简单）</div>
+                <p>这是目前安装Metasploit最简单且最可靠的方法：</p>
+                <pre><code>pkg install metasploit</code></pre>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">方法二：使用metasploit_in_termux项目</div>
+                <p>如果官方仓库的方法失效，可以尝试社区维护的安装方法：</p>
+                <pre><code># 克隆项目仓库
+git clone https://github.com/gushmazuko/metasploit_in_termux.git
+cd metasploit_in_termux
+
+# 运行安装脚本
+chmod +x metasploit.sh
+./metasploit.sh</code></pre>
+                <p>安装完成后，可以通过输入<code>msfconsole</code>命令启动Metasploit框架。</p>
+            </div>
+        </div>
+
+        <div class="section" id="troubleshooting">
+            <h2>⚠️ 第五步：解决常见问题</h2>
+            
+            <h3>5.1 Metasploit启动问题</h3>
+            <p>如果在运行msfconsole时遇到<code>/etc/resolv.conf</code>找不到的错误，可以尝试以下解决方案：</p>
+            
+            <div class="method">
+                <div class="method-title">方法一：修改Metasploit源代码</div>
+                <pre><code># 进入Metasploit安装目录
+cd /data/data/com.termux/files/usr/opt/metasploit-framework
+
+# 替换路径引用
+sed -i '0,/\"\/etc\/resolv.conf\"/s//\"\/data\/data\/com.termux\/files\/usr\/etc\/resolv.conf\"/' $(find . -name 'resolver.rb')</code></pre>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">方法二：创建符号链接（需要root权限）</div>
+                <pre><code>ln -s /data/data/com.termux/files/usr/etc/resolv.conf /etc/resolv.conf</code></pre>
+            </div>
+            
+            <h3>5.2 性能优化建议</h3>
+            <ul>
+                <li><strong>定期更新：</strong> 定期运行<code>pkg update && pkg upgrade</code>和<code>apt update && apt upgrade</code>（在Kali环境中）保持系统和工具最新。</li>
+                <li><strong>资源管理：</strong> 同时运行Termux、Kali和Metasploit可能会消耗大量资源，不需要时及时关闭后台进程。</li>
+                <li><strong>存储空间：</strong> 定期清理不需要的软件包和临时文件，释放存储空间。</li>
+            </ul>
+        </div>
+
+        <div class="section" id="verification">
+            <h2>📝 最终验证</h2>
+            <p>完成所有安装后，可以通过以下命令验证安装是否成功：</p>
+            
+            <div class="method">
+                <div class="method-title">验证Kali Linux</div>
+                <pre><code># 在Termux中启动Kali环境后执行
+cat /etc/os-release</code></pre>
+                <p>应该显示Kali Linux的相关信息。</p>
+            </div>
+            
+            <div class="method">
+                <div class="method-title">验证Metasploit</div>
+                <pre><code>msfconsole --version</code></pre>
+                <p>如果能显示版本信息，说明安装成功。</p>
+            </div>
+            
+            <div class="success">
+                <p><strong>恭喜！</strong> 现在你已经成功在安卓手机上配置了Kali Linux和Metasploit框架，可以随时随地开展合法的安全测试和学习了！</p>
+            </div>
+        </div>
+
+        <div class="section" id="tips">
+            <h2>💡 使用建议与注意事项</h2>
+            <ul>
+                <li><strong>法律与道德：</strong> Kali Linux和Metasploit是专业的网络安全工具，仅应在你拥有合法授权的系统上使用，不得用于非法活动。</li>
+                <li><strong>移动设备的限制：</strong> 在安卓设备上运行Kali Linux和Metasploit可能会有性能限制，部分功能可能无法像在完整Linux系统上那样流畅运行。</li>
+                <li><strong>备份重要数据：</strong> 安装过程中可能会修改系统文件，建议提前备份手机中的重要数据。</li>
+                <li><strong>保持更新：</strong> 定期更新工具以获取最新功能和安全补丁。</li>
+            </ul>
+            
+            <div class="warning">
+                <p><strong>免责声明：</strong> 本指南仅用于教育和合法的安全测试目的。使用者应对自己的行为承担全部法律责任。</p>
+            </div>
+            
+            <h3>相关链接</h3>
+            <ul>
+                <li><a href="https://termux.com/" target="_blank">Termux官方文档</a></li>
+                <li><a href="https://www.kali.org/" target="_blank">Kali Linux官方网站</a></li>
+                <li><a href="https://www.metasploit.com/" target="_blank">Metasploit框架文档</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 在安卓手机上配置Kali Linux与Metasploit完整指南</p>
+            <p>本指南仅用于教育和合法的安全测试目的</p>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 添加代码复制功能
+        document.querySelectorAll('pre').forEach(pre => {
+            const button = document.createElement('button');
+            button.textContent = '复制';
+            button.className = 'copy-button';
+            button.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: #4a148c;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 12px;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.3s;
+            `;
+            
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+            
+            button.addEventListener('click', () => {
+                const code = pre.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.textContent = '已复制!';
+                    setTimeout(() => {
+                        button.textContent = '复制';
+                    }, 2000);
+                });
+            });
+            
+            pre.addEventListener('mouseenter', () => {
+                button.style.opacity = '1';
+            });
+            
+            pre.addEventListener('mouseleave', () => {
+                button.style.opacity = '0.7';
+            });
+        });
+    </script>
+</body>
+</html>
